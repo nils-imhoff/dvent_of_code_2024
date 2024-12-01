@@ -7,7 +7,7 @@
 
   outputs = { self, nixpkgs }: {
     devShells = {
-      x86_64-linux = let
+      default = let
         pkgs = import nixpkgs {
           system = "x86_64-linux";
         };
