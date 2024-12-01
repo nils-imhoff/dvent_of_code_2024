@@ -7,15 +7,15 @@
 
   outputs = { self, nixpkgs }: {
     devShells = {
-      default = let
+      x86_64-linux = let
         pkgs = import nixpkgs {
           system = "x86_64-linux";
         };
       in pkgs.mkShell {
         packages = with pkgs; [
-          zig   # Zig-Compiler
-          git   # Git für Versionskontrolle
-          gdb   # Debugger
+          zig
+          git
+          gdb
         ];
       };
     };
