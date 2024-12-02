@@ -33,6 +33,7 @@
           pkgs.mkShell {
             # The Nix packages provided in the environment
             packages = [
+              pkgs.zig
               # Python plus helper tools
               (python.withPackages (ps: with ps; [
                 virtualenv # Virtualenv
