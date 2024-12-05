@@ -1,6 +1,4 @@
-zig/day1/zig-cache/
-zig/day1/zig-out/
-zig/day2/day2
-zig/day2/day2.o
-zig/day3/day3.o
-zig/day3/day3
+zig/*/zig-cache/
+zig/*/zig-out/
+zig/*/*.o
+zig/*/*/
