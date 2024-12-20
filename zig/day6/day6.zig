@@ -39,13 +39,13 @@ const PointD = struct {
 };
 
 pub fn main() !void {
-    const part1Answer = solvePartOne(input);
+    const part1Answer = part1(input);
     std.debug.print("Part 1  = {any}.\n", .{part1Answer});
-    const part2Answer = solvePartTwo(input);
+    const part2Answer = part2(input);
     std.debug.print("Part 2  = {any}.\n", .{part2Answer});
 }
 
-pub fn solvePartOne(data: []const u8) !u32 {
+pub fn part1(data: []const u8) !u32 {
     var lines = std.mem.split(u8, data, "\n");
 
     var currentPos = Point{ .x = 0, .y = 0 };
@@ -130,7 +130,7 @@ pub fn solvePartOne(data: []const u8) !u32 {
     return unique_points.count();
 }
 
-pub fn solvePartTwo(data: []const u8) !u32 {
+pub fn part2(data: []const u8) !u32 {
     var lines = std.mem.split(u8, data, "\n");
 
     var currentPos = PointD{ .x = 0, .y = 0, .direction = Direction.north };

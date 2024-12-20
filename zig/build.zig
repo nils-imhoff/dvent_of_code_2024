@@ -12,6 +12,8 @@ pub fn build(b: *std.Build) void {
         "day5",
         "day10",
         "day11",
+        "day12",
+        "day13",
     };
 
     // Erstellt einen "run-all" Step

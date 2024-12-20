@@ -5,14 +5,12 @@ fn splitNumber(num: u64) [2]u64 {
     var temp = num;
     var count: usize = 0;
 
-    // Extract digits
     while (temp != 0) {
         digits[count] = @as(u8, @intCast(temp % 10));
         temp /= 10;
         count += 1;
     }
 
-    // Rebuild left and right halves
     const half = count / 2;
     var left: u64 = 0;
     var right: u64 = 0;
@@ -38,28 +36,22 @@ fn numDigits(num: u64) u8 {
     return count;
 }
 
-pub fn main() !void {
-    const allocator = std.heap.page_allocator;
-    const stdout = std.io.getStdOut().writer();
+pub fn part1(input: []const u8) !void {
+    const alloc = std.heap.page_allocator;
 
-    // Read input
-    const file = try std.fs.cwd().openFile("input11.txt", .{});
-    defer file.close();
-
-    var buffer: [1024]u8 = undefined;
-    var tokenizer = std.mem.tokenize(u8, buffer[0..try file.readAll(&buffer)], " \n\t");
-
-    var stone_counts = std.AutoHashMap(u64, u64).init(allocator);
+    var stone_counts = std.AutoHashMap(u64, u64).init(alloc);
     defer stone_counts.deinit();
 
+    // Parse input
+    var tokenizer = std.mem.tokenize(u8, input, " \n\t");
     while (tokenizer.next()) |token| {
         const value = try std.fmt.parseInt(u64, token, 10);
-        try stone_counts.put(value, 1); // Initialize frequency map
+        try stone_counts.put(value, 1);
     }
 
-    // Perform transformations
-    for (0..75) |blink| {
-        var new_stone_counts = std.AutoHashMap(u64, u64).init(allocator);
+    // Perform 25 transformations
+    for (0..25) |_| {
+        var new_stone_counts = std.AutoHashMap(u64, u64).init(alloc);
 
         var iterator = stone_counts.iterator();
         while (iterator.next()) |entry| {
@@ -67,14 +59,12 @@ pub fn main() !void {
             const count = entry.value_ptr.*;
 
             if (stone == 0) {
-                // Rule 1: 0 -> 1
                 if (new_stone_counts.get(1)) |existing_count| {
                     try new_stone_counts.put(1, existing_count + count);
                 } else {
                     try new_stone_counts.put(1, count);
                 }
             } else if (numDigits(stone) % 2 == 0) {
-                // Rule 2: Split into two stones
                 const halves = splitNumber(stone);
                 for (halves) |half| {
                     if (new_stone_counts.get(half)) |existing_count| {
@@ -84,7 +74,6 @@ pub fn main() !void {
                     }
                 }
             } else {
-                // Rule 3: Multiply by 2024
                 const new_stone = try std.math.mul(u64, stone, 2024);
                 if (new_stone_counts.get(new_stone)) |existing_count| {
                     try new_stone_counts.put(new_stone, existing_count + count);
@@ -96,24 +85,80 @@ pub fn main() !void {
 
         stone_counts.deinit();
         stone_counts = new_stone_counts;
-
-        // Print result for 25 blinks
-        if (blink == 24) {
-            var total: u64 = 0;
-            var temp_iterator = stone_counts.iterator();
-            while (temp_iterator.next()) |entry| {
-                total += entry.value_ptr.*;
-            }
-            try stdout.print("Number of stones after 25 blinks: {}\n", .{total});
-        }
     }
 
-    // Calculate total number of stones after 75 blinks
     var total: u64 = 0;
     var final_iterator = stone_counts.iterator();
     while (final_iterator.next()) |entry| {
         total += entry.value_ptr.*;
     }
 
-    try stdout.print("Number of stones after 75 blinks: {}\n", .{total});
+    std.debug.print("Number of stones after 25 blinks: {}\n", .{total});
+}
+
+pub fn part2(input: []const u8) !void {
+    const alloc = std.heap.page_allocator;
+
+    var stone_counts = std.AutoHashMap(u64, u64).init(alloc);
+    defer stone_counts.deinit();
+
+    // Parse input
+    var tokenizer = std.mem.tokenize(u8, input, " \n\t");
+    while (tokenizer.next()) |token| {
+        const value = try std.fmt.parseInt(u64, token, 10);
+        try stone_counts.put(value, 1);
+    }
+
+    // Perform 75 transformations
+    for (0..75) |_| {
+        var new_stone_counts = std.AutoHashMap(u64, u64).init(alloc);
+
+        var iterator = stone_counts.iterator();
+        while (iterator.next()) |entry| {
+            const stone = entry.key_ptr.*;
+            const count = entry.value_ptr.*;
+
+            if (stone == 0) {
+                if (new_stone_counts.get(1)) |existing_count| {
+                    try new_stone_counts.put(1, existing_count + count);
+                } else {
+                    try new_stone_counts.put(1, count);
+                }
+            } else if (numDigits(stone) % 2 == 0) {
+                const halves = splitNumber(stone);
+                for (halves) |half| {
+                    if (new_stone_counts.get(half)) |existing_count| {
+                        try new_stone_counts.put(half, existing_count + count);
+                    } else {
+                        try new_stone_counts.put(half, count);
+                    }
+                }
+            } else {
+                const new_stone = try std.math.mul(u64, stone, 2024);
+                if (new_stone_counts.get(new_stone)) |existing_count| {
+                    try new_stone_counts.put(new_stone, existing_count + count);
+                } else {
+                    try new_stone_counts.put(new_stone, count);
+                }
+            }
+        }
+
+        stone_counts.deinit();
+        stone_counts = new_stone_counts;
+    }
+
+    var total: u64 = 0;
+    var final_iterator = stone_counts.iterator();
+    while (final_iterator.next()) |entry| {
+        total += entry.value_ptr.*;
+    }
+
+    std.debug.print("Number of stones after 75 blinks: {}\n", .{total});
+}
+
+const puzzle_input = @embedFile("input11.txt");
+
+pub fn main() !void {
+    try part1(puzzle_input);
+    try part2(puzzle_input);
 }
